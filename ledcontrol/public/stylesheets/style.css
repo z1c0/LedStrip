@@ -8,9 +8,9 @@ a {
 }
 
 .tile {
-  width: 6em;
-  height: 6em;
-  margin: 0.2em;
+  width: 16em;
+  height: 16em;
+  margin: 0.5em;
   float: left;
   border-color: rgb(10,10,10);
   border-style: solid;
