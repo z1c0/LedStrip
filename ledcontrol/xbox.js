@@ -4,7 +4,8 @@ var cron = require('cron'),
     SsdpClient = require('node-ssdp').Client, 
     ssdpClient = new SsdpClient({
       //logLevel: 'TRACE',
-      unicastHost: '192.168.1.146'
+      unicastHost: '192.168.1.118' // raspi
+      //unicastHost: '192.168.1.146' // my pc      
     });
 
 var xboxLastSeen = moment();
