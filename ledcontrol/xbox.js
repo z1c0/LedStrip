@@ -11,7 +11,7 @@ var xboxLastSeen = moment();
 var xboxOn = false;
 
 // run every x seconds
-var cronJob = cron.job("*/5 * * * * *", function() {
+var cronJob = cron.job("*/20 * * * * *", function() {
   ssdpClient.search('ssdp:all');
 });
 
@@ -28,9 +28,9 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
       http.get({
         host: h,
         path: '/?r=0&g=255&b=0'}).on("error", function () { console.log("GET request error"); });
-      xboxLastSeen = moment();
       xboxOn = true;
     }
+    xboxLastSeen = moment();
   } else {
     if (secondsNotSeen >= 30 && xboxOn) {
       console.log("XBox off");
