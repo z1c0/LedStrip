@@ -55,7 +55,7 @@ function hsvToRgb(h, s, v) {
 }
 
 function updateLeds(animate) {
-  var step = 0.01;
+  var step = 0.005;
   var delta = 0.01;
   var r = 0,
       g = 0,
