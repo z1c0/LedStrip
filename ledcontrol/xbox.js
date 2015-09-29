@@ -14,7 +14,7 @@ var currentHue = Math.random();
 var targetHue = Math.random();
 
 // run every x seconds
-var cronJob = cron.job("*/20 * * * * *", function() {
+var cronJob = cron.job("*/45 * * * * *", function() {
   ssdpClient.search('ssdp:all');
 });
 
@@ -55,7 +55,7 @@ function hsvToRgb(h, s, v) {
 }
 
 function updateLeds(animate) {
-  var step = 0.005;
+  var step = 0.0025;
   var delta = 0.01;
   var r = 0,
       g = 0,
@@ -69,6 +69,7 @@ function updateLeds(animate) {
     } else {
       currentHue += step;
     }
+    currentHue = Math.max(0, Math.min(1, currentHue)); // clamp
     var c = hsvToRgb(currentHue, 1, 1);
     r = c[0];
     g = c[1];
