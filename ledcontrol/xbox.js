@@ -89,7 +89,7 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
     xboxOn = true;
     xboxLastSeen = moment();
   } else {
-    if (secondsNotSeen >= 30 && xboxOn) {
+    if (secondsNotSeen >= 60 && xboxOn) {
       updateLeds(false);
       xboxOn = false;
     }
