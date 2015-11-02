@@ -14,7 +14,7 @@ var currentHue = Math.random();
 var targetHue = Math.random();
 
 // run every x seconds
-var cronJob = cron.job("*/45 * * * * *", function() {
+var cronJob = cron.job("*/30 * * * * *", function() {
   ssdpClient.search('ssdp:all');
 });
 
@@ -84,7 +84,7 @@ function updateLeds(animate) {
 ssdpClient.on('response', function (headers, statusCode, rinfo) {
   //console.log(headers);
   var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
-  if (headers.USN.indexOf("uuid:58dc09ed-a5e8-46d3-843e-f37c96844a1c") > -1) {
+  if (headers.USN.indexOf("uuid:450df1e0-fa31-40f5-9c40-311e36656a81") > -1) {
     updateLeds(true);
     xboxOn = true;
     xboxLastSeen = moment();
