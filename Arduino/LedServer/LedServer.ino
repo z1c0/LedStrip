@@ -1,4 +1,3 @@
-#define FLOATEMIT 1
 #include <EtherCard.h>
 
 #define B_PIN 3
@@ -26,21 +25,15 @@ void setup ()
   ether.staticSetup(myip);
 }
 
-static uint16_t GetTemperature()
-{
-  return (uint16_t)((analogRead(0) * 0.004882814 - 0.5) * 100.0);
-}
-
 static word HomePage(byte r, byte g, byte b)
 {
-  uint16_t temp = GetTemperature();
   bfill = ether.tcpOffset();  
   bfill.emit_p(PSTR(
     "HTTP/1.0 200 OK\r\n"
     "Content-Type: application/json\r\n"
     "Pragma: no-cache\r\n"
     "\r\n"
-    "{ 'red': $D, 'green': $D, 'blue': $D, 'temp': $D }"), r, g, b, temp);
+    "{ 'red': $D, 'green': $D, 'blue': $D }"), r, g, b);
   return bfill.position();
 }
 
