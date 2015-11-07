@@ -1,5 +1,6 @@
 var cron = require('cron'),
     http = require('http'),
+     xmldoc = require('xmldoc'),
     moment = require('moment'),
     SsdpClient = require('node-ssdp').Client, 
     ssdpClient = new SsdpClient({
@@ -81,19 +82,41 @@ function updateLeds(animate) {
       on("error", function () { console.log("GET request error"); });
 }
 
+
+
 ssdpClient.on('response', function (headers, statusCode, rinfo) {
   //console.log(headers);
-  var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
-  if (headers.USN.indexOf("uuid:450df1e0-fa31-40f5-9c40-311e36656a81") > -1) {
-    updateLeds(true);
-    xboxOn = true;
-    xboxLastSeen = moment();
-  } else {
-    if (secondsNotSeen >= 60 && xboxOn) {
-      updateLeds(false);
-      xboxOn = false;
-    }
-  }
+    
+  var req = http.get(headers.LOCATION, function(res) {
+    var xml = '';
+    res.on('data', function(chunk) {
+      xml += chunk;
+    });  
+    res.on('end', function() {
+      // parse xml
+      var device = new xmldoc.XmlDocument(xml).childNamed("device");
+      if (device) {
+        var friendlyName = device.childNamed("friendlyName");
+        if (friendlyName) {      
+          //console.log(friendlyName.val);
+          var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
+          if (friendlyName.val === "Xbox-SystemOS") {
+            updateLeds(true);
+            xboxOn = true;
+            xboxLastSeen = moment();
+          } else {
+            if (secondsNotSeen >= 60 && xboxOn) {
+              updateLeds(false);
+              xboxOn = false;
+            }
+          }
+        }        
+      }
+    });  
+  });  
+  req.on('error', function(err) {
+    console.log(err);
+  }); 
 });
 
 module.exports = {

@@ -16,6 +16,7 @@
     "serve-favicon": "~2.3.0",
     "cron": "*",
     "node-ssdp": "*",
-    "moment": "*"
+    "moment": "*",
+    "xmldoc": "*"
   }
 }
