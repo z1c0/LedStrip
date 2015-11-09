@@ -6,7 +6,9 @@ html(lang="en")
     script(src='https://code.jquery.com/jquery-2.1.4.min.js')
     script(src='/javascripts/logic.js')
   body
-    p XBox On: #{xbox.isXBoxOn()}
+    p XBox on: #{xbox.isXBoxOn()}
+    - var style = 'background-color:rgb(' + xbox.r() + ',' + xbox.g() + ',' + xbox.b() + ')';
+    span(style=style) RGB: #{xbox.r()} / #{xbox.g()} / #{xbox.b()} 
     #container
   script(type='text/javascript').
     $(function() {

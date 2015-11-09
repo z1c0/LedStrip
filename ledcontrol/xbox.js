@@ -30,6 +30,9 @@ var xboxOn = false;
 var currentHue = Math.random();
 var targetHue = Math.random();
 var ssdpDone = false;
+var r = 0,
+    g = 0,
+    b = 0;
 
 // run every x seconds
 var cronJob = cron.job("*/30 * * * * *", function() {
@@ -76,9 +79,6 @@ function hsvToRgb(h, s, v) {
 function updateLeds(animate) {
   var step = 0.0025;
   var delta = 0.01;
-  var r = 0,
-      g = 0,
-      b = 0;
   if (animate) {
     if (Math.abs(currentHue - targetHue) < delta) {
       targetHue = Math.random();
@@ -142,6 +142,15 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
 module.exports = {
   isXBoxOn: function() {
     return xboxOn;
+  },
+  r: function() {
+    return r;
+  },
+  g: function() {
+    return g;
+  },
+  b: function() {
+    return b;
   },
   init: function () {
     cronJob.start();
