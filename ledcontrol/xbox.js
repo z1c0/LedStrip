@@ -35,7 +35,7 @@ var r = 0,
     b = 0;
 
 // run every x seconds
-var cronJob = cron.job("*/30 * * * * *", function() {
+var cronJob = cron.job("*/25 * * * * *", function() {
   ssdpDone = false;
   ssdpClient.search('ssdp:all');
 });
@@ -111,20 +111,26 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
     });  
     res.on('end', function() {
       // parse xml
-      var device = new xmldoc.XmlDocument(xml).childNamed("device");
-      if (device) {
-        var friendlyName = device.childNamed("friendlyName");
-        if (friendlyName) {      
-          //console.log(friendlyName.val);
-          if (friendlyName.val === "Xbox-SystemOS") {
-            xboxLastSeen = moment();
-            if (!ssdpDone) {
-              ssdpDone = true;
-              updateLeds(true);
-              xboxOn = true;
+      try {
+        if (xml[0] == '<') { // otherwise, don't bother
+          var device = new xmldoc.XmlDocument(xml).childNamed("device");
+          if (device) {
+            var friendlyName = device.childNamed("friendlyName");
+            if (friendlyName) {      
+              //console.log(friendlyName.val);
+              if (friendlyName.val === "Xbox-SystemOS") {
+                xboxLastSeen = moment();
+                if (!ssdpDone) {
+                  ssdpDone = true;
+                  updateLeds(true);
+                  xboxOn = true;
+                }
+              }
             }
           }
         }        
+      } catch (e) {
+        //console.log("Error: " + headers.LOCATION + " - " + xml);
       }
     });  
   });  
