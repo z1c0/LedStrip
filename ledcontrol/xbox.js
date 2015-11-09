@@ -1,21 +1,39 @@
 var cron = require('cron'),
     http = require('http'),
-     xmldoc = require('xmldoc'),
+    xmldoc = require('xmldoc'),
     moment = require('moment'),
     SsdpClient = require('node-ssdp').Client, 
     ssdpClient = new SsdpClient({
       //logLevel: 'TRACE',
-      unicastHost: '192.168.1.118' // raspi
+      unicastHost: getIPAddress()
+      //unicastHost: '192.168.1.118' // raspi
       //unicastHost: '192.168.1.146' // my pc      
     });
+    
+function getIPAddress() {
+  var interfaces = require('os').networkInterfaces();
+  for (var dev in interfaces) {  
+    var iface = interfaces[dev].filter(function(details) {
+      return details.family === 'IPv4' && details.internal === false && details.address.indexOf("169.") != 0;
+    });  
+    if (iface.length > 0)  {
+      var a = iface[0].address; 
+      console.log(a);
+      return a;
+    }
+  }
+  return "0.0.0.0";
+}    
 
 var xboxLastSeen = moment();
 var xboxOn = false;
 var currentHue = Math.random();
 var targetHue = Math.random();
+var ssdpDone = false;
 
 // run every x seconds
 var cronJob = cron.job("*/30 * * * * *", function() {
+  ssdpDone = false;
   ssdpClient.search('ssdp:all');
 });
 
@@ -86,7 +104,6 @@ function updateLeds(animate) {
 
 ssdpClient.on('response', function (headers, statusCode, rinfo) {
   //console.log(headers);
-    
   var req = http.get(headers.LOCATION, function(res) {
     var xml = '';
     res.on('data', function(chunk) {
@@ -99,15 +116,12 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
         var friendlyName = device.childNamed("friendlyName");
         if (friendlyName) {      
           //console.log(friendlyName.val);
-          var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
           if (friendlyName.val === "Xbox-SystemOS") {
-            updateLeds(true);
-            xboxOn = true;
             xboxLastSeen = moment();
-          } else {
-            if (secondsNotSeen >= 60 && xboxOn) {
-              updateLeds(false);
-              xboxOn = false;
+            if (!ssdpDone) {
+              ssdpDone = true;
+              updateLeds(true);
+              xboxOn = true;
             }
           }
         }        
@@ -116,10 +130,19 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
   });  
   req.on('error', function(err) {
     console.log(err);
-  }); 
+  });
+  // Turn off?
+  var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
+  if (secondsNotSeen >= 60 && xboxOn) {
+    updateLeds(false);
+    xboxOn = false;
+  }    
 });
 
 module.exports = {
+  isXBoxOn: function() {
+    return xboxOn;
+  },
   init: function () {
     cronJob.start();
   }
