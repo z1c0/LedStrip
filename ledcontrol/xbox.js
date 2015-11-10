@@ -6,8 +6,6 @@ var cron = require('cron'),
     ssdpClient = new SsdpClient({
       //logLevel: 'TRACE',
       unicastHost: getIPAddress()
-      //unicastHost: '192.168.1.118' // raspi
-      //unicastHost: '192.168.1.146' // my pc      
     });
     
 function getIPAddress() {
@@ -25,14 +23,13 @@ function getIPAddress() {
   return "0.0.0.0";
 }    
 
-var xboxLastSeen = moment();
+var xboxLastSeen = moment([1980, 3, 10]);
 var xboxOn = false;
 var currentHue = Math.random();
 var targetHue = Math.random();
 var ssdpDone = false;
-var r = 0,
-    g = 0,
-    b = 0;
+var currentColor = { r : 0, g : 0, b : 0 };
+var targetColor = { r : 0, g : 0, b : 0 };
 
 // run every x seconds
 var cronJob = cron.job("*/20 * * * * *", function() {
@@ -77,7 +74,11 @@ function hsvToRgb(h, s, v) {
 }
 
 function updateLeds(animate) {
-  var step = 0.0025;
+  currentColor.r = 0;
+  currentColor.g = 0;
+  currentColor.b = 0;
+
+  var step = 0.0050;
   var delta = 0.01;
   if (animate) {
     if (Math.abs(currentHue - targetHue) < delta) {
@@ -90,14 +91,14 @@ function updateLeds(animate) {
     }
     currentHue = Math.max(0, Math.min(1, currentHue)); // clamp
     var c = hsvToRgb(currentHue, 1, 1);
-    r = c[0];
-    g = c[1];
-    b = c[2];
-  }
+    currentColor.r = c[0];
+    currentColor.g = c[1];
+    currentColor.b = c[2];
+  }  
   http.get({
     host: "192.168.1.45",
-    path: "/?r=" + r + "&g=" + g + "&b=" + b}).
-      on("error", function () { console.log("GET request error"); });
+    path: "/?r=" + currentColor.r + "&g=" + currentColor.g + "&b=" + currentColor.b}).
+      on("error", function () { console.log("ERROR: GET request to Arduino"); });
 }
 
 
@@ -112,50 +113,51 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
     res.on('end', function() {
       // parse xml
       try {
-        var device = new xmldoc.XmlDocument(xml).childNamed("device");
-        if (device) {
-          var friendlyName = device.childNamed("friendlyName");
-          if (friendlyName) {      
-            //console.log(friendlyName.val);
-            if (friendlyName.val === "Xbox-SystemOS") {
-              xboxLastSeen = moment();
-              if (!ssdpDone) {
-                ssdpDone = true;
-                updateLeds(true);
-                xboxOn = true;
+        if (xml[0] == '<') { // otherwise, don't bother
+          var device = new xmldoc.XmlDocument(xml).childNamed("device");
+          if (device) {
+            var friendlyName = device.childNamed("friendlyName");
+            if (friendlyName) {      
+              //console.log(friendlyName.val);
+              if (friendlyName.val === "Xbox-SystemOS") {
+                xboxLastSeen = moment();
+                if (!ssdpDone) {
+                  ssdpDone = true;
+                  updateLeds(true);
+                  xboxOn = true;
+                }
               }
             }
-          }        
-        }
-      }
-      catch (e) {
-        console.log(xml);
+          }
+        }        
+      } catch (e) {
+        //console.log("Error: " + headers.LOCATION + " - " + xml);
       }
     });  
   });  
   req.on('error', function(err) {
-    console.log(err);
+    console.log("Error for URL: " + headers.LOCATION + " - " + err);
   });
   // Turn off?
   var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
   if (secondsNotSeen >= 60 && xboxOn) {
     updateLeds(false);
     xboxOn = false;
-  }    
+  }
 });
 
 module.exports = {
-  isXBoxOn: function() {
+  isOn: function() {
     return xboxOn;
   },
-  r: function() {
-    return r;
+  getLastSeen: function() {
+    return moment(xboxLastSeen).fromNow();
   },
-  g: function() {
-    return g;
+  getCurrentColor: function() {
+    return currentColor;
   },
-  b: function() {
-    return b;
+  getTargetColor: function() {
+    return targetColor;
   },
   init: function () {
     cronJob.start();

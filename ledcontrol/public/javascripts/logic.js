@@ -21,7 +21,8 @@ function makeTiles() {
    
    colors.forEach(function(c) {	 
       var r = c[0], g = c[1], b = c[2]; 
-      var html = "<a href='#' onclick='switchColor(" + r + ", " + g + ", " + b + "); return false;'><div class='tile' style='background-color: rgb(" + r + "," + g + "," + b + ")'></div></a>";
+      //var html = "<a href='#' onclick='switchColor(" + r + ", " + g + ", " + b + "); return false;'><div class='tile' style='background-color: rgb(" + r + "," + g + "," + b + ")'></div></a>";
+      var html = "<div class='tile' style='background-color: rgb(" + r + "," + g + "," + b + ")'></div>";
       $("#container").append(html);
    });
 }

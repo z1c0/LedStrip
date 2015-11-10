@@ -7,6 +7,18 @@ a {
   color: #00B7FF;
 }
 
+#container {
+   overflow: hidden;
+}
+
+#diagnostics {
+  border: 0 solid black;
+  border-top-width: 1px;
+  margin-top: 2em;
+  margin-left: 1em;
+  padding: 0.5em;
+}
+
 .tile {
   width: 16em;
   height: 16em;
