@@ -31,6 +31,7 @@ var ssdpDone = false;
 var currentColor = { r : 0, g : 0, b : 0 };
 var targetColor = { r : 0, g : 0, b : 0 };
 var location = "";
+var deviceType = "";
 var checkInterval = 10;
 
 // run every x seconds
@@ -120,6 +121,10 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
           if (device) {
             var friendlyName = device.childNamed("friendlyName");
             if (friendlyName) {      
+              var dt = device.childNamed("deviceType");
+              if (dt) {              
+                deviceType = dt.val;
+              }
               //console.log(friendlyName.val);
               if (friendlyName.val === "Xbox-SystemOS") {
                 xboxLastSeen = moment();
@@ -158,6 +163,9 @@ module.exports = {
   },
   getLocation: function() {
     return location;    
+  },
+  getDeviceType: function() {
+    return deviceType;    
   },
   getCurrentColor: function() {
     return currentColor;

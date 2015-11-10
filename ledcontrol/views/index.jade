@@ -12,6 +12,7 @@ html(lang="en")
           - var status = xbox.isOn() ? "ON" : "OFF";
           p XBox: #{status}
           p last seen: #{xbox.getLastSeen()}          
+          p device type: #{xbox.getDeviceType()}          
           p location: #{xbox.getLocation()}          
           - var cc = xbox.getCurrentColor(); 
           - var styleC = 'background-color:rgb(' + cc.r + ',' + cc.g + ',' + cc.b + ')';
