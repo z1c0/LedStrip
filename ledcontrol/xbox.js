@@ -97,6 +97,11 @@ function updateLeds(animate) {
     currentColor.r = c[0];
     currentColor.g = c[1];
     currentColor.b = c[2];
+    
+    var t = hsvToRgb(targetHue, 1, 1);
+    targetColor.r = t[0];
+    targetColor.g = t[1];
+    targetColor.b = t[2];    
   }  
   http.get({
     host: "192.168.1.45",
