@@ -126,13 +126,13 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
           if (device) {
             var friendlyName = device.childNamed("friendlyName");
             if (friendlyName) {      
-              var dt = device.childNamed("deviceType");
-              if (dt) {              
-                deviceType = dt.val;
-              }
               //console.log(friendlyName.val);
               if (friendlyName.val === "Xbox-SystemOS") {
                 xboxLastSeen = moment();
+                var dt = device.childNamed("deviceType");
+                if (dt) {              
+                  deviceType = dt.val;
+                }
                 location = headers.LOCATION;
                 if (!ssdpDone) {
                   ssdpDone = true;
