@@ -11,9 +11,10 @@ html(lang="en")
         #diagnostics
           - var status = xbox.isOn() ? "ON" : "OFF";
           p XBox: #{status}
+          p last seen: #{xbox.getLastSeen()}          
+          p location: #{xbox.getLocation()}          
           - var cc = xbox.getCurrentColor(); 
           - var styleC = 'background-color:rgb(' + cc.r + ',' + cc.g + ',' + cc.b + ')';
-          p last seen: #{xbox.getLastSeen()}          
           p 
             span(style=styleC) current: #{cc.r} / #{cc.g} / #{cc.b}
           - var tc = xbox.getTargetColor(); 

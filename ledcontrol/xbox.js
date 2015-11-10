@@ -30,9 +30,11 @@ var targetHue = Math.random();
 var ssdpDone = false;
 var currentColor = { r : 0, g : 0, b : 0 };
 var targetColor = { r : 0, g : 0, b : 0 };
+var location = "";
+var checkInterval = 10;
 
 // run every x seconds
-var cronJob = cron.job("*/20 * * * * *", function() {
+var cronJob = cron.job("*/" + checkInterval + " * * * * *", function() {
   ssdpDone = false;
   ssdpClient.search('ssdp:all');
 });
@@ -121,6 +123,7 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
               //console.log(friendlyName.val);
               if (friendlyName.val === "Xbox-SystemOS") {
                 xboxLastSeen = moment();
+                location = headers.LOCATION;
                 if (!ssdpDone) {
                   ssdpDone = true;
                   updateLeds(true);
@@ -140,7 +143,7 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
   });
   // Turn off?
   var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
-  if (secondsNotSeen >= 60 && xboxOn) {
+  if (secondsNotSeen >= (checkInterval * 2.5) && xboxOn) {
     updateLeds(false);
     xboxOn = false;
   }
@@ -152,6 +155,9 @@ module.exports = {
   },
   getLastSeen: function() {
     return moment(xboxLastSeen).fromNow();
+  },
+  getLocation: function() {
+    return location;    
   },
   getCurrentColor: function() {
     return currentColor;
