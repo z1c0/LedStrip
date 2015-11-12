@@ -102,11 +102,12 @@ function updateLeds(animate) {
     targetColor.r = t[0];
     targetColor.g = t[1];
     targetColor.b = t[2];    
-  }  
-  http.get({
+  }
+  var query = "/?r=" + currentColor.r + "&g=" + currentColor.g + "&b=" + currentColor.b;
+  http.get({    
     host: "192.168.1.45",
-    path: "/?r=" + currentColor.r + "&g=" + currentColor.g + "&b=" + currentColor.b}).
-      on("error", function () { console.log("ERROR: GET request to Arduino"); });
+    path: query }).
+      on("error", function () { console.log("FAILED Arduino GET: "+ query); });
 }
 
 
@@ -127,17 +128,19 @@ ssdpClient.on('response', function (headers, statusCode, rinfo) {
             var friendlyName = device.childNamed("friendlyName");
             if (friendlyName) {      
               //console.log(friendlyName.val);
-              if (friendlyName.val === "Xbox-SystemOS") {
-                xboxLastSeen = moment();
+              if (friendlyName.val === "Xbox-SystemOS") {                
                 var dt = device.childNamed("deviceType");
                 if (dt) {              
                   deviceType = dt.val;
-                }
-                location = headers.LOCATION;
-                if (!ssdpDone) {
-                  ssdpDone = true;
-                  updateLeds(true);
-                  xboxOn = true;
+                  if (deviceType == "urn:schemas-upnp-org:device:MediaRenderer:1") {                    
+                    xboxLastSeen = moment();
+                    location = headers.LOCATION;
+                    if (!ssdpDone) {
+                      ssdpDone = true;
+                      updateLeds(true);
+                      xboxOn = true;
+                    }
+                  }
                 }
               }
             }
