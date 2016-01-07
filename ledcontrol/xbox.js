@@ -114,46 +114,50 @@ function updateLeds(animate) {
 
 ssdpClient.on('response', function (headers, statusCode, rinfo) {
   //console.log(headers);
-  var req = http.get(headers.LOCATION, function(res) {
-    var xml = '';
-    res.on('data', function(chunk) {
-      xml += chunk;
-    });  
-    res.on('end', function() {
-      // parse xml
-      try {
-        if (xml[0] == '<') { // otherwise, don't bother
-          var device = new xmldoc.XmlDocument(xml).childNamed("device");
-          if (device) {
-            var friendlyName = device.childNamed("friendlyName");
-            if (friendlyName) {      
-              //console.log(friendlyName.val);
-              if (friendlyName.val === "Xbox-SystemOS") {                
-                var dt = device.childNamed("deviceType");
-                if (dt) {              
-                  deviceType = dt.val;
-                  if (deviceType == "urn:schemas-upnp-org:device:MediaRenderer:1") {                    
-                    xboxLastSeen = moment();
-                    location = headers.LOCATION;
-                    if (!ssdpDone) {
-                      ssdpDone = true;
-                      updateLeds(true);
-                      xboxOn = true;
+  var url = headers.LOCATION;
+  if (url && url.indexOf("http") != -1) 
+  {
+    var req = http.get(url, function(res) {
+      var xml = '';
+      res.on('data', function(chunk) {
+        xml += chunk;
+      });  
+      res.on('end', function() {
+        // parse xml
+        try {
+            if (xml[0] == '<') { // otherwise, don't bother
+            var device = new xmldoc.XmlDocument(xml).childNamed("device");
+            if (device) {
+                var friendlyName = device.childNamed("friendlyName");
+                if (friendlyName) {      
+                //console.log(friendlyName.val);
+                if (friendlyName.val === "Xbox-SystemOS") {                
+                    var dt = device.childNamed("deviceType");
+                    if (dt) {              
+                    deviceType = dt.val;
+                    if (deviceType == "urn:schemas-upnp-org:device:MediaRenderer:1") {                    
+                        xboxLastSeen = moment();
+                        location = headers.LOCATION;
+                        if (!ssdpDone) {
+                        ssdpDone = true;
+                        updateLeds(true);
+                        xboxOn = true;
+                        }
                     }
                   }
                 }
               }
             }
-          }
-        }        
-      } catch (e) {
-        //console.log("Error: " + headers.LOCATION + " - " + xml);
-      }
+          }        
+        } catch (e) {
+            //console.log("Error: " + headers.LOCATION + " - " + xml);
+        }
+      });  
     });  
-  });  
-  req.on('error', function(err) {
-    console.log("Error for URL: " + headers.LOCATION + " - " + err);
-  });
+    req.on('error', function(err) {
+        console.log("Error for URL: " + headers.LOCATION + " - " + err);
+    });
+  }
   // Turn off?
   var secondsNotSeen = moment().diff(xboxLastSeen) / 1000;
   if (secondsNotSeen >= (checkInterval * 2.5) && xboxOn) {

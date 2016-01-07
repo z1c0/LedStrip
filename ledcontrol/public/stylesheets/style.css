@@ -7,11 +7,15 @@ a {
   color: #00B7FF;
 }
 
+input[type=range] {
+  display: block;
+}
+
 #container {
    overflow: hidden;
 }
 
-#diagnostics {
+.section {
   border: 0 solid black;
   border-top-width: 1px;
   margin-top: 2em;

@@ -8,7 +8,14 @@ html(lang="en")
   body
     #container
     - if (xbox) {
-        #diagnostics
+        .section
+          span(id="currentVol") R
+          input(type="range", id="sliderR", value="0" min="0", max="255", onchange="sliderChange()")
+          span(id="currentVol") G
+          input(type="range", id="sliderG", value="0", min="0", max="255", onchange="sliderChange()")
+          span(id="currentVol") B
+          input(type="range", id="sliderB", value="0", min="0", max="255", onchange="sliderChange()")
+        .section
           - var status = xbox.isOn() ? "ON" : "OFF";
           p XBox: #{status}
           p last seen: #{xbox.getLastSeen()}          
