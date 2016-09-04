@@ -4,7 +4,7 @@
 #define R_PIN 5
 #define G_PIN 6
 
-static byte mymac[] = { 0x74, 0x69, 0x70, 0x2D, 0x30, 0x32 };
+static byte mymac[] = { 0x74, 0x59, 0x70, 0x2D, 0x30, 0x32 };
 static byte myip[] = { 192, 168, 1, 45 };
 
 byte Ethernet::buffer[500];
