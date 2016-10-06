@@ -44,7 +44,7 @@ void setup()
   
 float currentHue = 0;
 float targetHue = 0;
-String rgbString;
+String lcdString;
 
 void loop()
 {  
@@ -68,17 +68,21 @@ void loop()
   analogWrite(BLUEPIN, col.b);
 
   lcd.clear();
-  rgbString = "RGB: ";
-  rgbString += col.r;
-  rgbString += "/";
-  rgbString += col.g;
-  rgbString += "/";
-  rgbString += col.b;
+  lcd.setCursor(0, 0);
+  GetTimeString(lcdString);
+  Serial.println(lcdString);  
+  lcd.print(lcdString);
+  
+  lcdString = "RGB: ";
+  lcdString += col.r;
+  lcdString += "/";
+  lcdString += col.g;
+  lcdString += "/";
+  lcdString += col.b;
   lcd.setCursor(0, 1);
-  lcd.print(rgbString);
+  lcd.print(lcdString);
   
-  delay(FADESPEED);
-  
+  delay(FADESPEED);  
   //displayTime();
 }
 
@@ -128,6 +132,26 @@ byte bcdToDec(byte val)
 byte decToBcd(byte val)
 {
   return ( (val / 10 * 16) + (val % 10) );
+}
+
+void GetTimeString(String& s)
+{
+  byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
+  // retrieve data from DS3231
+  readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month, &year);
+  s = hour;
+  s += ':';
+  if (minute < 10)
+  {
+    s += '0';
+  }
+  s += minute;
+  s += ':';
+  if (second < 10)
+  {
+    s += '0';
+  }
+  s += second;
 }
 
 void displayTime()
