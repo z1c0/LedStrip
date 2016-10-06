@@ -35,8 +35,7 @@ void setup()
   pinMode(GREENPIN, OUTPUT);
   pinMode(BLUEPIN, OUTPUT);
 
-  long seed(getSeconds());
-  //Serial.println(seed);
+  auto seed(getSeconds());  
   randomSeed(seed);
 
   lcd.begin(16, 2);
@@ -50,7 +49,7 @@ void loop()
 {  
   if (abs(currentHue - targetHue) < DELTA)
   {
-    targetHue = static_cast <float>(rand()) / static_cast<float>(RAND_MAX); // rand_max?
+    targetHue = static_cast <float>(random()) / static_cast<float>(RAND_MAX); // rand_max?
   }
   if (currentHue > targetHue)
   {
@@ -70,7 +69,7 @@ void loop()
   lcd.clear();
   lcd.setCursor(0, 0);
   GetTimeString(lcdString);
-  Serial.println(lcdString);  
+  //Serial.println(lcdString);  
   lcd.print(lcdString);
   
   lcdString = "RGB: ";
