@@ -25,7 +25,11 @@ struct Color
   byte g;
   byte b;
 };
- 
+
+float currentHue;
+float targetHue;
+String lcdString;
+
 void setup()
 {
   Wire.begin();
@@ -39,17 +43,21 @@ void setup()
   randomSeed(seed);
 
   lcd.begin(16, 2);
+
+  currentHue = getRandomHue();
+  targetHue = getRandomHue();
 }
   
-float currentHue = 0;
-float targetHue = 0;
-String lcdString;
+float getRandomHue()
+{
+  return static_cast <float>(random(0, 1000)) / 1000.0;
+}
 
 void loop()
 {  
   if (abs(currentHue - targetHue) < DELTA)
   {
-    targetHue = static_cast <float>(random()) / static_cast<float>(RAND_MAX); // rand_max?
+    targetHue = getRandomHue();
   }
   if (currentHue > targetHue)
   {
@@ -138,7 +146,12 @@ void GetTimeString(String& s)
   byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
   // retrieve data from DS3231
   readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month, &year);
-  s = hour;
+  s = "";
+  if (hour < 10)
+  {
+    s += '0';
+  }
+  s += hour;
   s += ':';
   if (minute < 10)
   {
